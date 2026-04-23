@@ -6,7 +6,7 @@ from dotenv import load_dotenv
 load_dotenv()
 
 # Load the cleaned dataset
-DATA_PATH = "data/te440_cleaned_startup_data.csv"
+DATA_PATH = "data/best_state_for_startup.csv"
 try:
     df = pd.read_csv(DATA_PATH)
 except FileNotFoundError:
