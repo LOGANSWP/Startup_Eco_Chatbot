@@ -45,28 +45,34 @@ for message in st.session_state.messages:
     with st.chat_message(message["role"]):
         st.markdown(message["content"])
 
-# 6. Handle User Input
-# st.chat_input creates the text box at the bottom of the screen
+# 6. Handle User Input with Bulletproofing
 if prompt := st.chat_input("Ask about state taxes, demographics, or rankings..."):
 
-    # Immediately display the user's message in the chat interface
-    with st.chat_message("user"):
-        st.markdown(prompt)
+    # --- NEW: Frontend Validation Guardrails ---
+    clean_prompt = prompt.strip()
 
-    # Add the user's message to the session state
-    st.session_state.messages.append({"role": "user", "content": prompt})
+    # Guardrail 1: Catch empty or dangerously short inputs
+    if len(clean_prompt) < 3:
+        st.warning("⚠️ Please type a more specific question about the dataset.")
 
-    # 7. Fetch and Display the Assistant's Response
-    with st.chat_message("assistant"):
-        # The spinner provides visual feedback while the LangChain agent "thinks"
-        with st.spinner("Analyzing dataset..."):
+    # Guardrail 2: Catch obvious gibberish (e.g., "asdfghjkl")
+    elif len(clean_prompt.split()) == 1 and len(clean_prompt) > 15:
+        st.warning(
+            "⚠️ Input not recognized. Please ask a natural language question about the startups data.")
 
-            # Call the function from your agent.py file
-            response = query_startup_data(prompt)
+    else:
+        # --- Proceed with normal execution if the input passes the guardrails ---
+        with st.chat_message("user"):
+            st.markdown(clean_prompt)
 
-            # Display the result
-            st.markdown(response)
+        st.session_state.messages.append(
+            {"role": "user", "content": clean_prompt})
 
-    # Add the assistant's response to the session state so it stays on screen
-    st.session_state.messages.append(
-        {"role": "assistant", "content": response})
+        with st.chat_message("assistant"):
+            with st.spinner("Analyzing dataset..."):
+                # Pass the cleaned query to the backend
+                response = query_startup_data(clean_prompt)
+                st.markdown(response)
+
+        st.session_state.messages.append(
+            {"role": "assistant", "content": response})
