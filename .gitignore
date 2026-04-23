@@ -1,0 +1,12 @@
+# Environments
+venv/
+__pycache__/
+
+# Environment variables (Crucial: Keep your API keys safe!)
+.env
+
+# OS generated files
+.DS_Store
+
+# Data
+data/
