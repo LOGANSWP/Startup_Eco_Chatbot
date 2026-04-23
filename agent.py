@@ -1,6 +1,7 @@
 import pandas as pd
 import os
 from dotenv import load_dotenv
+from langchain_openai import ChatOpenAI
 
 # Load environment variables (API Key)
 load_dotenv()
